@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ConvenientTypes {
+  LivingRoom
+  Kitchen
+  Bedroom
+  Bathroom
+  Office
+  Laundry
+  Garage
+  Balcony
+}
+
+model User {
+  id                       String  @id @default(uuid())
+  name                     String
+  email                    String  @unique
+  password                 String
+  image                    String?
+  passwordCode             String?
+  stripeCustomerId         String?
+  stripeSubscriptionId     String?
+  stripeSubscriptionStatus String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime?
+  passwordCodeExpires DateTime?
+
+  authToken AuthorizationTokens?
+  projects  Project[]
+  clients   Client[]
+
+  @@map("users")
+}
+
+model Project {
+  id           String  @id @default(uuid())
+  name         String
+  description  String
+  cep          String
+  address      String
+  neighborhood String
+  city         String
+  houseNumber  String
+  size         String
+  imageCover   String?
+  userId       String
+  clientId     String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  user        User         @relation(fields: [userId], references: [id])
+  client      Client?      @relation(fields: [clientId], references: [id])
+  convenients Convenient[]
+
+  @@map("projects")
+}
+
+model Convenient {
+  id          String          @id @default(uuid())
+  type        ConvenientTypes
+  image360Uri String
+  coverUrl    String
+  projectId   String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@map("convenients")
+}
+
+model Client {
+  id          String    @id @default(uuid())
+  name        String
+  phoneNumber String
+  clientImage String?
+  userId      String
+  project     Project[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("clients")
+}
+
+model AuthorizationTokens {
+  id           Int     @id @default(autoincrement())
+  accessToken  String
+  refreshToken String
+  revoked      Boolean @default(false)
+  userId       String  @unique
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("authorization_tokens")
+}
