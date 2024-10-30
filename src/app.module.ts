@@ -3,12 +3,14 @@ import { SharedModule } from './shared/shared.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './shared/env/env';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [() => envSchema] }),
     SharedModule,
     UserModule,
-    ConfigModule.forRoot({ isGlobal: true, load: [() => envSchema] }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],

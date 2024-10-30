@@ -44,9 +44,9 @@ export class UserController {
     };
   }
 
-  @Post('/create')
+  @Post('/signup')
   @HttpCode(HttpStatus.CREATED)
-  public async create(
+  public async signup(
     @Body() data: CreateUserDto,
   ): Promise<ResponseEntity<string>> {
     const userId = await this._userService.createUser(data);
