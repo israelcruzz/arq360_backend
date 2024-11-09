@@ -12,4 +12,8 @@ export abstract class UserInterface {
   abstract updatePassword(userId: string, newPassword: string): Promise<string>;
   abstract getUserByEmail(email: string): Promise<User>;
   abstract uploadPhoto(userId: string, url: string): Promise<void>;
+  abstract saveRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void>;
 }

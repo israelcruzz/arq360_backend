@@ -107,4 +107,21 @@ export class UserRepository implements UserInterface {
       },
     });
   }
+
+  public async saveRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this._db.refreshToken.update({
+      where: {
+        userId,
+      },
+      data: {
+        refreshToken,
+        revoked: true,
+        expiresAt: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
+        updatedAt: new Date(),
+      },
+    });
+  }
 }

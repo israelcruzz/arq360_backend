@@ -5,11 +5,12 @@ import {
   HttpCode,
   HttpStatus,
   MaxFileSizeValidator,
-  Param,
   ParseFilePipe,
   Patch,
   Post,
+  Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -20,7 +21,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { ResponseEntity } from '@/shared/entities/response.entity';
-import { User } from '@prisma/client';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('/users')
 export class UserController {
@@ -30,12 +31,11 @@ export class UserController {
     this._userService = userService;
   }
 
-  @Get('/:userId')
+  @Get('user')
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  public async getUser(
-    @Param('userId') userId: string,
-  ): Promise<ResponseEntity<User>> {
-    const user = await this._userService.getUserById(userId);
+  public async getUser(@Request() req: Express.Request) {
+    const user = await this._userService.getUserById(req.user.sub);
 
     return {
       data: user,
@@ -44,7 +44,7 @@ export class UserController {
     };
   }
 
-  @Post('/signup')
+  @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   public async signup(
     @Body() data: CreateUserDto,
@@ -58,11 +58,11 @@ export class UserController {
     };
   }
 
-  @Patch('/:userId/photo')
+  @Patch('photo')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
   public async updatePhoto(
-    @Param('userId') userId: string,
+    @Request() req: Express.Request,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 1000000 })],
@@ -70,7 +70,7 @@ export class UserController {
     )
     file: Express.Multer.File,
   ) {
-    const url = await this._userService.uploadPhoto(userId, file);
+    const url = await this._userService.uploadPhoto(req.user.sub, file);
 
     return {
       data: url,
@@ -79,14 +79,14 @@ export class UserController {
     };
   }
 
-  @Patch('/:userId/informations')
+  @Patch('informations')
   @HttpCode(HttpStatus.OK)
   public async updateInformations(
-    @Param('userId') userId: string,
+    @Request() req: Express.Request,
     @Body() data: UpdateInformationsUserDto,
   ): Promise<ResponseEntity<string>> {
     const responseUserId = await this._userService.updateInformationsFromUser(
-      userId,
+      req.user.sub,
       data,
     );
 
@@ -97,13 +97,16 @@ export class UserController {
     };
   }
 
-  @Patch('/:userId/password')
+  @Patch('password')
   @HttpCode(HttpStatus.OK)
   public async updatePassword(
-    @Param('userId') userId: string,
+    @Request() req: Express.Request,
     @Body() data: UpdatePassowordDto,
   ) {
-    const responseUserId = await this._userService.updatePassword(userId, data);
+    const responseUserId = await this._userService.updatePassword(
+      req.user.sub,
+      data,
+    );
 
     return {
       data: responseUserId,

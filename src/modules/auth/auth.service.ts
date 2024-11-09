@@ -30,9 +30,14 @@ export class AuthService {
     }
 
     const payload = { sub: userExists.id };
+    const accessToken = await this._tokenService.generateToken(payload);
+    const refreshToken = await this._tokenService.generateRefreshToken(payload);
+
+    await this._userService.saveRefreshToken(userExists.id, refreshToken);
 
     return {
-      access_token: await this._tokenService.generateTokenAsync(payload),
+      accessToken,
+      refreshToken,
     };
   }
 }
