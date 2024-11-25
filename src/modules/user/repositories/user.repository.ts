@@ -118,8 +118,21 @@ export class UserRepository implements UserInterface {
       },
       data: {
         refreshToken,
-        revoked: true,
+        revoked: false,
         expiresAt: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  public async saveCodePassword(id: string, code: string): Promise<void> {
+    await this._db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        passwordCode: code,
+        passwordCodeExpires: new Date(new Date().getTime() + 1000 * 60 * 60),
         updatedAt: new Date(),
       },
     });

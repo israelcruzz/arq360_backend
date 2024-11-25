@@ -16,4 +16,5 @@ export abstract class UserInterface {
     userId: string,
     refreshToken: string,
   ): Promise<void>;
+  abstract saveCodePassword(id: string, code: string): Promise<void>;
 }

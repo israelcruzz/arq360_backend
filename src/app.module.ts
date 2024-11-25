@@ -4,6 +4,9 @@ import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './shared/env/env';
 import { AuthModule } from './modules/auth/auth.module';
+import { ClientModule } from './modules/client/client.module';
+import { ConvenientModule } from './modules/convenient/convenient.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
@@ -11,6 +14,9 @@ import { AuthModule } from './modules/auth/auth.module';
     SharedModule,
     UserModule,
     AuthModule,
+    ClientModule,
+    ConvenientModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],

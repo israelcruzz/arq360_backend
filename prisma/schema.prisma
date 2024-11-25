@@ -34,8 +34,8 @@ model User {
   passwordCodeExpires DateTime?
 
   refreshToken RefreshToken?
-  projects  Project[]
-  clients   Client[]
+  projects     Project[]
+  clients      Client[]
 
   @@map("users")
 }
